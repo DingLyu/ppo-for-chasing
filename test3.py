@@ -97,17 +97,11 @@ class PPO:
             rewards.insert(0, discounted_reward)
         rewards = torch.tensor(rewards, dtype=torch.float32).to(device)
         rewards = (rewards - rewards.mean()) / (rewards.std() + 1e-7)
-        # print("rewards:", rewards.shape)
         old_states = torch.squeeze(torch.stack(self.buffer.states, dim=0)).detach().to(device)
-        # print("old_states:", old_states.shape)
         old_actions = torch.squeeze(torch.stack(self.buffer.actions, dim=0)).detach().to(device)
-        # print("old_actions:", old_actions.shape)
         old_logprobs = torch.squeeze(torch.stack(self.buffer.logprobs, dim=0)).detach().to(device)
-        # print("old_logprobs:", old_logprobs.shape)
         old_state_values = torch.squeeze(torch.stack(self.buffer.state_values, dim=0)).detach().to(device)
-        # print("old_state_values:", old_state_values.shape)
         advantages = rewards.detach() - old_state_values.detach()
-        print(rewards.shape)
         # print("advantages:", advantages.shape)
 
         for _ in range(self.K_epochs):
@@ -183,7 +177,6 @@ def train():
                 ppo_agent.update()
 
             if time_step % print_freq == 0:
-                # print average reward till last episode
                 print_avg_reward = print_running_reward / print_running_episodes
                 print("Episode : {} \t\t Timestep : {} \t\t Average Reward : {}".format(i_episode, time_step,
                                                                                         print_avg_reward))
@@ -203,26 +196,8 @@ def train():
 
     env.close()
 
-def onestep():
-    K_epochs = 80
-    eps_clip = 0.2
-    gamma = 0.99
-    lr_actor = 0.0003
-    lr_critic = 0.001
-    state_dim = 10
-    action_dim = 4
-    ppo_agent = PPO(state_dim, action_dim, lr_actor, lr_critic, gamma, K_epochs, eps_clip)
-    env = World_v2()
-    state, info = env.reset()
-    for i in range(10):
-        action = ppo_agent.select_action(state)
-        state, reward, done, info = env.step(action)
-        ppo_agent.buffer.rewards.append(reward)
-        ppo_agent.buffer.is_terminals.append(done)
-    ppo_agent.update()
-
 
 
 if __name__ == '__main__':
     train()
-    # onestep()
+  
