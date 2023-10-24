@@ -102,7 +102,6 @@ class PPO:
         old_logprobs = torch.squeeze(torch.stack(self.buffer.logprobs, dim=0)).detach().to(device)
         old_state_values = torch.squeeze(torch.stack(self.buffer.state_values, dim=0)).detach().to(device)
         advantages = rewards.detach() - old_state_values.detach()
-        # print("advantages:", advantages.shape)
 
         for _ in range(self.K_epochs):
             # Evaluating old actions and values
